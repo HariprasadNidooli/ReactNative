@@ -13,11 +13,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: 'gradle'
       
       - name: Make Gradlew executable
         run: chmod +x ./android/gradlew
@@ -25,11 +35,21 @@ jobs:
       - name: Build Release APK
         run: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --stacktrace
       
-      - name: Upload APK
+      - name: Upload APK to Release
         uses: softprops/action-gh-release@v1
         with:
           files: android/app/build/outputs/apk/release/*.apk
+          body: |
+            ## 🎬 NetStar Release
+            
+            Download the APK and install on Android 6.0+
+            
+            ### Installation Steps
+            1. Download the APK file below
+            2. Enable "Install from unknown sources" in Android settings
+            3. Open the APK file to install
+            4. Enjoy browsing movies!
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
